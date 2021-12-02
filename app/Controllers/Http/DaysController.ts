@@ -28,8 +28,8 @@ const DAYS = [
       answer: 1692075,
     },
     part2: {
-      status: STATUSES.QUEUED,
-      answer: null,
+      status: STATUSES.COMPLETE,
+      answer: 1749524700,
     },
   },
 ]
@@ -47,18 +47,18 @@ export default class DaysController {
     const day = DAYS[params.id - 1]
 
     if (day) {
-      // return response.send({ ...day })
+      return response.send({ ...day })
 
       // TODO: Perform the solutions in the background
 
       const input = await Drive.get(
         Application.tmpPath(`inputs/day-${params.id.padStart(2, '0')}-input.txt`)
       )
-      const part1 = { ...day.part1, answer: await solvePart1(input.toString()) }
-      // const part2 = { ...day.part2, answer: await solvePart2(input.toString()) }
+      // const part1 = { ...day.part1, answer: await solvePart1(input.toString()) }
+      const part2 = { ...day.part2, answer: await solvePart2(input.toString()) }
 
-      // return response.send({ ...day, part1, part2 })
-      return response.send({ ...day, part1 })
+      // return response.send({ ...day, part1 })
+      return response.send({ ...day, part2 })
     }
 
     throw new Error(`Sorry, that day doesn't exist. 😔`)

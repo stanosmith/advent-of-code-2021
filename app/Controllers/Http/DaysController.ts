@@ -1,7 +1,7 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import Drive from '@ioc:Adonis/Core/Drive'
-import { solvePart1, solvePart2 } from 'App/Solvers/Day01'
-import Application from '@ioc:Adonis/Core/Application'
+// import Drive from '@ioc:Adonis/Core/Drive'
+// import { solvePart1, solvePart2 } from 'App/Solvers/Day01'
+// import Application from '@ioc:Adonis/Core/Application'
 
 const STATUSES = {
   QUEUED: 'QUEUED',
@@ -15,8 +15,8 @@ const DAYS = [
       answer: 1154,
     },
     part2: {
-      status: STATUSES.QUEUED,
-      answer: null,
+      status: STATUSES.COMPLETE,
+      answer: 1127,
     },
   },
 ]
@@ -36,13 +36,14 @@ export default class DaysController {
     if (day) {
       // TODO: Perform the solutions in the background
 
-      const input = await Drive.get(
-        Application.tmpPath(`inputs/day-${params.id.padStart(2, '0')}-input.txt`)
-      )
+      // const input = await Drive.get(
+      //   Application.tmpPath(`inputs/day-${params.id.padStart(2, '0')}-input.txt`)
+      // )
       // const answer1 = await solvePart1(input.toString())
-      const answer = await solvePart2(input.toString())
+      // const answer = await solvePart2(input.toString())
 
-      return response.send({ ...day, answer })
+      // return response.send({ ...day, answer })
+      return response.send({ ...day })
     }
 
     throw new Error(`Sorry, that day doesn't exist. 😔`)

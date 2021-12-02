@@ -1,6 +1,6 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Drive from '@ioc:Adonis/Core/Drive'
-import { solvePart1 } from 'App/Solvers/Day01'
+import { solvePart1, solvePart2 } from 'App/Solvers/Day01'
 import Application from '@ioc:Adonis/Core/Application'
 
 const STATUSES = {
@@ -11,10 +11,12 @@ const DAYS = [
   {
     id: 1,
     part1: {
-      status: STATUSES.QUEUED,
-      description: '',
-      question: '',
+      status: STATUSES.COMPLETE,
       answer: 1154,
+    },
+    part2: {
+      status: STATUSES.QUEUED,
+      answer: null,
     },
   },
 ]
@@ -37,7 +39,8 @@ export default class DaysController {
       const input = await Drive.get(
         Application.tmpPath(`uploads/day-${params.id.padStart(2, '0')}-input.txt`)
       )
-      const answer = await solvePart1(input.toString())
+      // const answer1 = await solvePart1(input.toString())
+      const answer = await solvePart2(input.toString())
 
       return response.send({ ...day, answer })
     }

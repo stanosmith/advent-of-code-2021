@@ -37,7 +37,7 @@ export default class DaysController {
       // TODO: Perform the solutions in the background
 
       const input = await Drive.get(
-        Application.tmpPath(`uploads/day-${params.id.padStart(2, '0')}-input.txt`)
+        Application.tmpPath(`inputs/day-${params.id.padStart(2, '0')}-input.txt`)
       )
       // const answer1 = await solvePart1(input.toString())
       const answer = await solvePart2(input.toString())

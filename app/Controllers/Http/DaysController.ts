@@ -1,7 +1,8 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Drive from '@ioc:Adonis/Core/Drive'
 // import { solvePart1, solvePart2 } from 'App/Solvers/Day01'
-import { solvePart1, solvePart2 } from 'App/Solvers/Day02'
+// import { solvePart1, solvePart2 } from 'App/Solvers/Day02'
+import { solvePart1, solvePart2 } from 'App/Solvers/Day03'
 import Application from '@ioc:Adonis/Core/Application'
 
 const STATUSES = {
@@ -32,6 +33,17 @@ const DAYS = [
       answer: 1749524700,
     },
   },
+  {
+    id: 3,
+    part1: {
+      status: STATUSES.PROCESSING,
+      answer: null,
+    },
+    part2: {
+      status: STATUSES.PROCESSING,
+      answer: null,
+    },
+  },
 ]
 
 export default class DaysController {
@@ -47,18 +59,18 @@ export default class DaysController {
     const day = DAYS[params.id - 1]
 
     if (day) {
-      return response.send({ ...day })
+      // return response.send({ ...day })
 
       // TODO: Perform the solutions in the background
 
       const input = await Drive.get(
         Application.tmpPath(`inputs/day-${params.id.padStart(2, '0')}-input.txt`)
       )
-      // const part1 = { ...day.part1, answer: await solvePart1(input.toString()) }
-      const part2 = { ...day.part2, answer: await solvePart2(input.toString()) }
+      const part1 = { ...day.part1, answer: await solvePart1(input.toString()) }
+      // const part2 = { ...day.part2, answer: await solvePart2(input.toString()) }
 
-      // return response.send({ ...day, part1 })
-      return response.send({ ...day, part2 })
+      return response.send({ ...day, part1 })
+      // return response.send({ ...day, part2 })
     }
 
     throw new Error(`Sorry, that day doesn't exist. 😔`)

@@ -2,7 +2,8 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Drive from '@ioc:Adonis/Core/Drive'
 // import { solvePart1, solvePart2 } from 'App/Solvers/Day01'
 // import { solvePart1, solvePart2 } from 'App/Solvers/Day02'
-import { solvePart1, solvePart2 } from 'App/Solvers/Day03'
+// import { solvePart1, solvePart2 } from 'App/Solvers/Day03'
+import { solvePart1, solvePart2 } from 'App/Solvers/Day04'
 import Application from '@ioc:Adonis/Core/Application'
 
 const STATUSES = {
@@ -35,6 +36,17 @@ const DAYS = [
   },
   {
     id: 3,
+    part1: {
+      status: STATUSES.COMPLETE,
+      answer: 2583164,
+    },
+    part2: {
+      status: STATUSES.PROCESSING,
+      answer: null,
+    },
+  },
+  {
+    id: 4,
     part1: {
       status: STATUSES.PROCESSING,
       answer: null,

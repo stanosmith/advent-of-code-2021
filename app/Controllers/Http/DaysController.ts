@@ -1,70 +1,23 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Drive from '@ioc:Adonis/Core/Drive'
+import Airtable from 'airtable'
 // import { solvePart1, solvePart2 } from 'App/Solvers/Day01'
 // import { solvePart1, solvePart2 } from 'App/Solvers/Day02'
 // import { solvePart1, solvePart2 } from 'App/Solvers/Day03'
 import { solvePart1, solvePart2 } from 'App/Solvers/Day04'
 import Application from '@ioc:Adonis/Core/Application'
+import Env from '@ioc:Adonis/Core/Env'
 
-const STATUSES = {
-  QUEUED: 'QUEUED',
-  PROCESSING: 'PROCESSING',
-  COMPLETE: 'COMPLETE',
-}
-const DAYS = [
-  {
-    id: 1,
-    part1: {
-      status: STATUSES.COMPLETE,
-      answer: 1154,
-    },
-    part2: {
-      status: STATUSES.COMPLETE,
-      answer: 1127,
-    },
-  },
-  {
-    id: 2,
-    part1: {
-      status: STATUSES.COMPLETE,
-      answer: 1692075,
-    },
-    part2: {
-      status: STATUSES.COMPLETE,
-      answer: 1749524700,
-    },
-  },
-  {
-    id: 3,
-    part1: {
-      status: STATUSES.COMPLETE,
-      answer: 2583164,
-    },
-    part2: {
-      status: STATUSES.PROCESSING,
-      answer: null,
-    },
-  },
-  {
-    id: 4,
-    part1: {
-      status: STATUSES.PROCESSING,
-      answer: null,
-    },
-    part2: {
-      status: STATUSES.PROCESSING,
-      answer: null,
-    },
-  },
-]
+const base = new Airtable({ apiKey: Env.get('AIRTABLE_KEY') }).base(Env.get('AIRTABLE_BASE'))
 
 export default class DaysController {
   public async index({ response }: HttpContextContract) {
     // TODO: If the answer isn't available, add the day to the solving queue
 
-    // TODO: Pull the days data from Airtable
+    // Pull Days data from Airtable
+    const records = await base('Days').select().firstPage()
 
-    return response.send(DAYS)
+    return response.send(records)
   }
 
   public async show({ params, response }: HttpContextContract) {

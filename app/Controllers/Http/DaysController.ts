@@ -62,6 +62,12 @@ export default class DaysController {
 
         // Solve each part
         const daySolvers = solvers[`day${dayName.toString().padStart(2, '0')}`]
+
+        // Throw error if no solver is found
+        if (typeof daySolvers === 'undefined') {
+          throw new Error(`No solvers found for Day ${day.fields.name}. 🤨`)
+        }
+
         const part1 = { answer: await daySolvers.solvePart1(input) }
         const part2 = { answer: await daySolvers.solvePart2(input) }
 

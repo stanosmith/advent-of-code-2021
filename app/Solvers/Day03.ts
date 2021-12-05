@@ -94,3 +94,8 @@ export const solvePart2 = async (input: string) => {
 01010`
   return input.split('\n')
 }
+
+export default {
+  solvePart1,
+  solvePart2,
+}

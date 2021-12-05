@@ -18,27 +18,30 @@ export const solvePart1 = async (input: string) => {
 18  8 23 26 20
 22 11 13  6  5
  2  0 12  3  7`
-  return input
-    .split('\n')
-    .map((numbers, index) => {
-      if (index === 0) {
-        return { drawnNumbers: numbers.split(',') }
-      }
-      if (numbers !== '') {
-        return numbers.split(' ').filter((value) => value !== '')
-      }
-      return numbers
-    })
-    .reduce((numbersAndBoards, numbers, index) => {
-      if (index === 0) {
-        return numbersAndBoards
-      }
-      if (numbers === '') {
-        return [...numbersAndBoards, { board: [] }]
-      }
-    }, [])
+  return input.split('\n').map((numbers, index) => {
+    if (index === 0) {
+      return { drawnNumbers: numbers.split(',') }
+    }
+    if (numbers !== '') {
+      return numbers.split(' ').filter((value) => value !== '')
+    }
+    return numbers
+  })
+  // .reduce((numbersAndBoards, numbers, index) => {
+  //   if (index === 0) {
+  //     return numbersAndBoards
+  //   }
+  //   if (numbers === '') {
+  //     return [...numbersAndBoards, { board: [] }]
+  //   }
+  // }, [])
 }
 
 export const solvePart2 = async (input: string) => {
   return input.split('\n')
+}
+
+export default {
+  solvePart1,
+  solvePart2,
 }

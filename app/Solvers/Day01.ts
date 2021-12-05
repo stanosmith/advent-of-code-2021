@@ -32,7 +32,7 @@ export const solvePart2 = async (input: string) => {
     input
       .split('\n')
       .map((value) => parseInt(value, 10))
-      .reduce((groupedValues, value, index, values) => {
+      .reduce((groupedValues, _value, index, values) => {
         if (index >= window - 1) {
           return [...groupedValues, values.slice(index + 1 - window, index + 1)]
         }
@@ -56,4 +56,9 @@ function evalIncrease(value, index, values) {
 
 function calculateTotal(total, value) {
   return total + value
+}
+
+export default {
+  solvePart1,
+  solvePart2,
 }

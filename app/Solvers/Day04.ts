@@ -1,23 +1,23 @@
 export const solvePart1 = async (input: string) => {
-  input = `7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
-
-22 13 17 11  0
- 8  2 23  4 24
-21  9 14 16  7
- 6 10  3 18  5
- 1 12 20 15 19
-
- 3 15  0  2 22
- 9 18 13 17  5
-19  8  7 25 23
-20 11 10 24  4
-14 21 16 12  6
-
-14 21 17 24  4
-10 16 15  9 19
-18  8 23 26 20
-22 11 13  6  5
- 2  0 12  3  7`
+  //   input = `7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
+  //
+  // 22 13 17 11  0
+  //  8  2 23  4 24
+  // 21  9 14 16  7
+  //  6 10  3 18  5
+  //  1 12 20 15 19
+  //
+  //  3 15  0  2 22
+  //  9 18 13 17  5
+  // 19  8  7 25 23
+  // 20 11 10 24  4
+  // 14 21 16 12  6
+  //
+  // 14 21 17 24  4
+  // 10 16 15  9 19
+  // 18  8 23 26 20
+  // 22 11 13  6  5
+  //  2  0 12  3  7`
 
   const numbersDrawn = input
     .split('\n')[0]
@@ -49,7 +49,7 @@ export const solvePart1 = async (input: string) => {
     })
 
   // TODO: Find the board that will win FIRST
-  let winningNumbers = [] as Array<number>
+  let winningBoardSum = 0
   let winningNumber = -1
   let markedBoards = []
 
@@ -63,15 +63,15 @@ export const solvePart1 = async (input: string) => {
     }
 
     // Now check for a winner
-    winningNumbers = markedBoards.filter(checkIfWinner)
+    winningBoardSum = getWinningBoardSum(markedBoards)
 
-    if (winningNumbers.length) {
+    if (winningBoardSum > 0) {
       winningNumber = drawnNumber
       break
     }
   }
 
-  return { winningNumber, winningNumbers }
+  return { winningNumber, winningBoardSum, totalScore: winningBoardSum * winningNumber }
 }
 
 function markBoard(value, board) {
@@ -85,20 +85,58 @@ function markBoard(value, board) {
   })
 }
 
-function checkIfWinner(board) {
-  // TODO: Check (by COLUMN and ROW) for a case where all values are checked
-  const hasCompleteRow =
-    board.filter((row) => {
-      return (
-        row.filter((spot) => {
-          return spot.isMarked
-        }).length === row.length
-      )
-    }).length > 0
+function getWinningBoardSum(markedBoards) {
+  return markedBoards
+    .map((board) => {
+      return board
+        .map((row, rowIndex, allRows) => {
+          // Check by row, and COLUMN, for a case where all spots are marked
+          return {
+            board,
+            rowLength: row.length,
+            rowFiltered: row.filter(isSpotMarked),
+            columnFiltered: getColumn(rowIndex, allRows).filter(isSpotMarked),
+          }
+        })
+        .filter((rowAndColumn) => {
+          // TODO: Check (by COLUMN and ROW) for a case where all values are checked
+          const allSpotsMarkedRow = rowAndColumn.rowFiltered.length === rowAndColumn.rowLength
+          // return allSpotsMarkedRow
 
-  if (hasCompleteRow) return true
+          const allSpotsMarkedColumn = rowAndColumn.columnFiltered.length === rowAndColumn.rowLength
 
-  // const hasCompleteColumn =
+          return allSpotsMarkedRow || allSpotsMarkedColumn
+        })
+    })
+    .filter((board) => board.length !== 0)
+    .flat(2)
+    .map(({ rowFiltered, columnFiltered, board }) => {
+      const sumOfUnmarkedSpots = board
+        .flat(2)
+        .filter((spot) => !spot.isMarked)
+        .map((spot) => spot.value)
+        .reduce((sum, value) => sum + value, 0)
+
+      return sumOfUnmarkedSpots
+
+      if (rowFiltered.length > columnFiltered.length) {
+        return { sumOfUnmarkedSpots, winningNumbers: rowFiltered.map((spot) => spot.value) }
+      }
+      return { sumOfUnmarkedSpots, winningNumbers: columnFiltered.map((spot) => spot.value) }
+    })
+    .reduce((_sum, value) => value, 0)
+}
+
+function getColumn(rowIndex, allRows) {
+  let column = [] as Array<any>
+  for (let i = 0; i < allRows.length; i++) {
+    column.push(allRows[i][rowIndex])
+  }
+  return column
+}
+
+function isSpotMarked(spot) {
+  return spot.isMarked
 }
 
 export const solvePart2 = async (input: string) => {

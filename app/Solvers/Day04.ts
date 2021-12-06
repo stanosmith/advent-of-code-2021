@@ -48,7 +48,57 @@ export const solvePart1 = async (input: string) => {
       }
     })
 
-  return { numbersDrawn, boards }
+  // TODO: Find the board that will win FIRST
+  let winningNumbers = [] as Array<number>
+  let winningNumber = -1
+  let markedBoards = []
+
+  for (let i = 0; i < numbersDrawn.length; i++) {
+    const drawnNumber = numbersDrawn[i]
+
+    if (markedBoards.length === 0) {
+      markedBoards = boards.map(markBoard.bind(null, drawnNumber))
+    } else {
+      markedBoards = markedBoards.map(markBoard.bind(null, drawnNumber))
+    }
+
+    // Now check for a winner
+    winningNumbers = markedBoards.filter(checkIfWinner)
+
+    if (winningNumbers.length) {
+      winningNumber = drawnNumber
+      break
+    }
+  }
+
+  return { winningNumber, winningNumbers }
+}
+
+function markBoard(value, board) {
+  return board.map((row) => {
+    return row.map((spot) => {
+      if (!spot.isMarked) {
+        return { ...spot, isMarked: spot.value === value }
+      }
+      return spot
+    })
+  })
+}
+
+function checkIfWinner(board) {
+  // TODO: Check (by COLUMN and ROW) for a case where all values are checked
+  const hasCompleteRow =
+    board.filter((row) => {
+      return (
+        row.filter((spot) => {
+          return spot.isMarked
+        }).length === row.length
+      )
+    }).length > 0
+
+  if (hasCompleteRow) return true
+
+  // const hasCompleteColumn =
 }
 
 export const solvePart2 = async (input: string) => {

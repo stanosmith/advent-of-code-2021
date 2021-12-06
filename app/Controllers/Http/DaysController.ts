@@ -1,12 +1,14 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-// import Drive from '@ioc:Adonis/Core/Drive'
-import Airtable from 'airtable'
+import Drive from '@ioc:Adonis/Core/Drive'
+import Application from '@ioc:Adonis/Core/Application'
 import Env from '@ioc:Adonis/Core/Env'
+import Airtable from 'airtable'
 import got from 'got'
 import solvers from 'App/Solvers'
 
 const base = new Airtable({ apiKey: Env.get('AIRTABLE_KEY') }).base(Env.get('AIRTABLE_BASE'))
 const tableName = 'Days'
+const useCache = true
 
 export default class DaysController {
   public async index({ response, request }: HttpContextContract) {
@@ -20,18 +22,33 @@ export default class DaysController {
   }
 
   public async show({ params, response }: HttpContextContract) {
-    // TODO: Pull Day data from Airtable
-    const day = await base(tableName).find(params.id)
+    // TODO: Read cached day, if not found, get from Airtable and then cache it
+
+    const localPath = Application.tmpPath(`inputs/day-${params.id}.json`)
+    let day
+
+    if (useCache) {
+      try {
+        // Get input from the local file system
+        const fileBuffer = await Drive.get(localPath)
+        day = JSON.parse(fileBuffer.toString())
+      } catch (e) {
+        console.info('Day data not cached, file will be loaded from Airtable')
+      }
+    }
+
+    if (!day) {
+      try {
+        // Pull Day data from Airtable
+        day = await base(tableName).find(params.id)
+        await Drive.put(localPath, JSON.stringify(day))
+      } catch (e) {
+        console.error(e)
+      }
+    }
 
     if (day) {
-      // return response.send(day)
-
-      // TODO: Perform the solutions in the background
-
-      // Get input from the local file system
-      // const input = await Drive.get(
-      //   Application.tmpPath(`inputs/day-${params.id.padStart(2, '0')}-input.txt`)
-      // )
+      // TODO: Loop through the parts, load their data and only solve if there is no answer
 
       // Get input from Airtable
       if (day.fields.inputs && Array.isArray(day.fields.inputs)) {
@@ -71,7 +88,7 @@ export default class DaysController {
         const part1 = { answer: await daySolvers.solvePart1(input) }
         const part2 = { answer: await daySolvers.solvePart2(input) }
 
-        return response.send({ day: dayName, part1, part2 })
+        return response.send({ day: dayName, part1, part2, ...day })
       }
 
       throw new Error(`No inputs found for Day ${day.fields.name}. 🤷`)

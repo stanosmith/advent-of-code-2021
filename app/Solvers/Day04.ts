@@ -86,45 +86,42 @@ function markBoard(value, board) {
 }
 
 function getWinningBoardSum(markedBoards) {
-  return markedBoards
-    .map((board) => {
-      return board
-        .map((row, rowIndex, allRows) => {
-          // Check by row, and COLUMN, for a case where all spots are marked
-          return {
-            board,
-            rowLength: row.length,
-            rowFiltered: row.filter(isSpotMarked),
-            columnFiltered: getColumn(rowIndex, allRows).filter(isSpotMarked),
-          }
-        })
-        .filter((rowAndColumn) => {
-          // TODO: Check (by COLUMN and ROW) for a case where all values are checked
-          const allSpotsMarkedRow = rowAndColumn.rowFiltered.length === rowAndColumn.rowLength
-          // return allSpotsMarkedRow
+  return (
+    markedBoards
+      .map((board) => {
+        return board
+          .map((row, rowIndex, allRows) => {
+            // Check by row, and COLUMN, for a case where all spots are marked
+            return {
+              board,
+              rowLength: row.length,
+              rowFiltered: row.filter(isSpotMarked),
+              columnFiltered: getColumn(rowIndex, allRows).filter(isSpotMarked),
+            }
+          })
+          .filter((rowAndColumn) => {
+            // TODO: Check (by COLUMN and ROW) for a case where all values are checked
+            const allSpotsMarkedRow = rowAndColumn.rowFiltered.length === rowAndColumn.rowLength
+            // return allSpotsMarkedRow
 
-          const allSpotsMarkedColumn = rowAndColumn.columnFiltered.length === rowAndColumn.rowLength
+            const allSpotsMarkedColumn =
+              rowAndColumn.columnFiltered.length === rowAndColumn.rowLength
 
-          return allSpotsMarkedRow || allSpotsMarkedColumn
-        })
-    })
-    .filter((board) => board.length !== 0)
-    .flat(2)
-    .map(({ rowFiltered, columnFiltered, board }) => {
-      const sumOfUnmarkedSpots = board
-        .flat(2)
-        .filter((spot) => !spot.isMarked)
-        .map((spot) => spot.value)
-        .reduce((sum, value) => sum + value, 0)
-
-      return sumOfUnmarkedSpots
-
-      if (rowFiltered.length > columnFiltered.length) {
-        return { sumOfUnmarkedSpots, winningNumbers: rowFiltered.map((spot) => spot.value) }
-      }
-      return { sumOfUnmarkedSpots, winningNumbers: columnFiltered.map((spot) => spot.value) }
-    })
-    .reduce((_sum, value) => value, 0)
+            return allSpotsMarkedRow || allSpotsMarkedColumn
+          })
+      })
+      .filter((board) => board.length !== 0)
+      .flat(2)
+      // .map(({ rowFiltered, columnFiltered, board }) => {
+      .map(({ board }) => {
+        return board
+          .flat(2)
+          .filter((spot) => !spot.isMarked)
+          .map((spot) => spot.value)
+          .reduce((sum, value) => sum + value, 0)
+      })
+      .reduce((_sum, value) => value, 0)
+  )
 }
 
 function getColumn(rowIndex, allRows) {

@@ -30,39 +30,38 @@ export const solvePart1 = async (input: string) => {
   // TODO: Create the array as we go through the list
   // let diagram = [] as Array<any>
 
-  const coordinates = inputParsed
-    .map((lineSegment) => {
-      return lineSegment
-        .split(' -> ')
-        .map((lineSegment) => lineSegment.split(',').map((value) => parseInt(value)))
-    })
-    .reduce((diagram, lineSegment) => {
-      // [
-      //   [
-      //     0,
-      //     9
-      //   ],
-      //   [
-      //     5,
-      //     9
-      //   ]
-      // ]
-      lineSegment.flat(2).forEach((value, index) => {
-        switch (index) {
-          case 0:
-            diagram[value]
-            break
-          case 1:
-            break
-          case 2:
-            break
-          case 3:
-            break
-        }
-      })
-
-      return diagram
-    }, [])
+  const coordinates = inputParsed.map((lineSegment) => {
+    return lineSegment
+      .split(' -> ')
+      .map((lineSegment) => lineSegment.split(',').map((value) => parseInt(value)))
+  })
+  // .reduce((diagram, lineSegment) => {
+  //   // [
+  //   //   [
+  //   //     0,
+  //   //     9
+  //   //   ],
+  //   //   [
+  //   //     5,
+  //   //     9
+  //   //   ]
+  //   // ]
+  //   lineSegment.flat(2).forEach((value, index) => {
+  //     switch (index) {
+  //       case 0:
+  //         diagram[value]
+  //         break
+  //       case 1:
+  //         break
+  //       case 2:
+  //         break
+  //       case 3:
+  //         break
+  //     }
+  //   })
+  //
+  //   return diagram
+  // }, [])
 
   return coordinates
   // return { diagram, coordinates }

@@ -30,40 +30,26 @@ export const solvePart1 = async (input: string) => {
   // TODO: Create the array as we go through the list
   // let diagram = [] as Array<any>
 
-  const coordinates = inputParsed.map((lineSegment) => {
-    return lineSegment
-      .split(' -> ')
-      .map((lineSegment) => lineSegment.split(',').map((value) => parseInt(value)))
-  })
-  // .reduce((diagram, lineSegment) => {
-  //   // [
-  //   //   [
-  //   //     0,
-  //   //     9
-  //   //   ],
-  //   //   [
-  //   //     5,
-  //   //     9
-  //   //   ]
-  //   // ]
-  //   lineSegment.flat(2).forEach((value, index) => {
-  //     switch (index) {
-  //       case 0:
-  //         diagram[value]
-  //         break
-  //       case 1:
-  //         break
-  //       case 2:
-  //         break
-  //       case 3:
-  //         break
-  //     }
-  //   })
-  //
-  //   return diagram
-  // }, [])
+  const coordinates = inputParsed
+    .map((lineSegment) => {
+      return lineSegment
+        .split(' -> ')
+        .map((lineSegment) => lineSegment.split(',').map((value) => parseInt(value)))
+    })
+    .reduce((diagram, lineSegment) => {
+      const points = lineSegment.flat(2)
+      const startX = points[0]
+      const startY = points[1]
+      const endX = points[2]
+      const endY = points[3]
 
-  return coordinates
+      const lineStart = new Array()
+      const lineEnd =
+
+      return [...diagram, { startX, startY, endX, endY }]
+    }, [])
+
+  return { coordinates }
   // return { diagram, coordinates }
 
   // Create the dot matrix

@@ -24,4 +24,5 @@ Route.get('/', async () => {
   return { hello: 'world' }
 })
 
+// TODO: Change to `/years/{YYYY}/days/{DD}` and don't use resource route
 Route.resource('days', 'DaysController').except(['destroy']).apiOnly()

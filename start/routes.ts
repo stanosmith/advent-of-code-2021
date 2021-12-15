@@ -24,5 +24,20 @@ Route.get('/', async () => {
   return { hello: 'world' }
 })
 
-// TODO: Change to `/years/{YYYY}/days/{DD}` and don't use resource route
-Route.resource('days', 'DaysController').except(['destroy']).apiOnly()
+// Days
+Route.group(() => {
+  Route.get('', 'DaysController.index')
+  Route.get('/:id', 'DaysController.show')
+}).prefix('/days')
+
+// Years
+Route.group(() => {
+  Route.get('', 'YearsController.index')
+  Route.get('/:id', 'YearsController.show')
+
+  // Days by year
+  Route.group(() => {
+    Route.get('', 'DaysController.index')
+    Route.get('/:dayId', 'DaysController.show')
+  }).prefix('/:yearId/days')
+}).prefix('/years')

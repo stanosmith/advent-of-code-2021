@@ -21,23 +21,19 @@
 import Route from '@ioc:Adonis/Core/Route'
 
 Route.get('/', async () => {
-  return { hello: 'world' }
+  return 'https://adventofcode.com'
 })
-
-// Days
-Route.group(() => {
-  Route.get('', 'DaysController.index')
-  Route.get('/:id', 'DaysController.show')
-}).prefix('/days')
 
 // Years
 Route.group(() => {
   Route.get('', 'YearsController.index')
-  Route.get('/:id', 'YearsController.show')
+  Route.get('/:name', 'YearsController.show')
 
   // Days by year
   Route.group(() => {
     Route.get('', 'DaysController.index')
-    Route.get('/:dayId', 'DaysController.show')
-  }).prefix('/:yearId/days')
-}).prefix('/years')
+    Route.get('/:name', 'DaysController.show')
+  }).prefix('/:yearName/days')
+})
+  .prefix('/years')
+  .middleware('airtable')

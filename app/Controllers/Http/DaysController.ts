@@ -8,23 +8,25 @@ import solvers from 'App/Solvers'
 
 const base = new Airtable({ apiKey: Env.get('AIRTABLE_KEY') }).base(Env.get('AIRTABLE_BASE'))
 const tableName = 'Days'
-const useCache = true
+const useCache = false
 
 export default class DaysController {
-  public async index({ response, request }: HttpContextContract) {
-    const year = request.qs().year
-    let params = year ? { filterByFormula: `yearName="${year}"` } : {}
+  public async index({ response, params, request }: HttpContextContract) {
+    const urlQueries = request.qs()
+    const { yearName } = params
 
     // Pull Days data from Airtable
-    const records = await base(tableName).select(params).firstPage()
+    const records = await base(tableName)
+      .select({ filterByFormula: `yearName="${yearName}"` })
+      .firstPage()
 
-    return response.send(records)
+    return response.send({ urlQueries, totalRecords: records.length, records })
   }
 
   public async show({ params, response }: HttpContextContract) {
-    // TODO: Read cached day, if not found, get from Airtable and then cache it
-
-    const localPath = Application.tmpPath(`inputs/day-${params.id}.json`)
+    // Get cached day, if not found, get from Airtable and then cache it
+    const { yearName, name } = params
+    let localPath = Application.tmpPath(`inputs/day-${yearName}-${name}.json`)
     let day
 
     if (useCache) {
@@ -40,14 +42,23 @@ export default class DaysController {
     if (!day) {
       try {
         // Pull Day data from Airtable
-        day = await base(tableName).find(params.id)
-        await Drive.put(localPath, JSON.stringify(day))
+        const page = await base(tableName)
+          .select({
+            filterByFormula: `AND(name="${name}",yearName="${yearName}")`,
+          })
+          .firstPage()
+
+        // There should only be one item in the array
+        day = page[0]
       } catch (e) {
         console.error(e)
       }
     }
 
     if (day) {
+      // Cache the day data
+      await Drive.put(localPath, JSON.stringify(day))
+
       // TODO: Loop through the parts, load their data and only solve if there is no answer
 
       // Get input from Airtable
@@ -80,20 +91,21 @@ export default class DaysController {
         // Solve each part
         const daySolvers = solvers[`day${dayName.toString().padStart(2, '0')}`]
 
-        // Throw error if no solver is found
-        if (typeof daySolvers === 'undefined') {
-          throw new Error(`No solvers found for Day ${day.fields.name}. 🤨`)
+        let part1 = {}
+        let part2 = {}
+
+        // If we have solvers, solve each part
+        if (typeof daySolvers !== 'undefined') {
+          part1 = { answer: await daySolvers.solvePart1(input) }
+          part2 = { answer: await daySolvers.solvePart2(input) }
         }
 
-        const part1 = { answer: await daySolvers.solvePart1(input) }
-        const part2 = { answer: await daySolvers.solvePart2(input) }
-
-        return response.send({ day: dayName, part1, part2, ...day })
+        return response.send({ part1, part2, ...day })
       }
 
       throw new Error(`No inputs found for Day ${day.fields.name}. 🤷`)
     }
 
-    throw new Error(`Sorry, Day with id: ${params.id} doesn't exist. 😔`)
+    return response.safeStatus(404).send(`Sorry, no data found for ${name}/${yearName}. 😔`)
   }
 }

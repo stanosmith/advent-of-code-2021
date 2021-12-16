@@ -26,12 +26,12 @@ export default class DaysController {
   public async show({ params, response }: HttpContextContract) {
     // Get cached day, if not found, get from Airtable and then cache it
     const { yearName, name } = params
-    let localPath = Application.tmpPath(`inputs/day-${yearName}-${name}.json`)
+    let localPath = Application.tmpPath(`inputs/day-${yearName}-${name.padStart(2, '0')}.json`)
     let day
 
     if (useCache) {
       try {
-        // Get input from the local file system
+        // Get day data from the local file system
         const fileBuffer = await Drive.get(localPath)
         day = JSON.parse(fileBuffer.toString())
       } catch (e) {

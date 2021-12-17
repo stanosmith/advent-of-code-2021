@@ -10,6 +10,32 @@ const base = new Airtable({ apiKey: Env.get('AIRTABLE_KEY') }).base(Env.get('AIR
 const tableName = 'Days'
 const useCache = false
 
+// Custom interfaces
+interface Attachment {
+  id: string
+  url: string
+  filename: string
+  size: number
+  type: string
+}
+interface DayFields {
+  name: string
+  parts: string[]
+  inputs: Attachment[]
+  year: string[]
+  yearName: string[]
+}
+interface Day {
+  _table: Object
+  id: string
+  _rawJson: {
+    id: string
+    fields: DayFields
+    createdTime: string
+  }
+  fields: DayFields
+}
+
 export default class DaysController {
   public async index({ response, params, request }: HttpContextContract) {
     const urlQueries = request.qs()
@@ -39,34 +65,11 @@ export default class DaysController {
     }
 
     // Get input from Airtable
-    // inputExample = {
-    //   "id": "attTgDPOonsptzEYC",
-    //   "url": "https://dl.airtable.com/.attachments/719fa6eb92780979dbcf0a7a0c5c04a5/a2cee7a2/input.txt",
-    //   "filename": "input.txt",
-    //   "size": 9311,
-    //   "type": "text/plain"
-    // }
-    const dayName = day.fields.name ?? ''
-
-    const inputs = day.fields.inputs.map(({ filename, url }) => ({
-      filename,
-      url,
-      isOgInput: filename === 'input.txt',
-    }))
-
-    const defaultInputData = inputs.find((input) => input.isOgInput)
-
-    // No default input found
-    if (!defaultInputData) {
-      throw new Error(`No default input found for Day ${dayName}. 🤷`)
-    }
-
-    // Load the default input text file
-    const input = await got(defaultInputData.url).text()
+    const input = await getInput(day)
 
     // TODO: Loop through the parts, load their data and only solve if there is no answer
     // Solve each part
-    const daySolvers = solvers[`day${dayName.toString().padStart(2, '0')}`]
+    const daySolvers = solvers[`day${day.fields.name.padStart(2, '0')}`]
 
     let part1 = {}
     let part2 = {}
@@ -81,29 +84,31 @@ export default class DaysController {
   }
 }
 
-interface Attachment {
-  id: string
-  url: string
-  filename: string
-  size: number
-  type: string
-}
-interface DayFields {
-  name: string
-  parts: string[]
-  inputs: Attachment[]
-  year: string[]
-  yearName: string[]
-}
-interface Day {
-  _table: Object
-  id: string
-  _rawJson: {
-    id: string
-    fields: DayFields
-    createdTime: string
+async function getInput(day: Day): Promise<string> {
+  // inputExample = {
+  //   "id": "attTgDPOonsptzEYC",
+  //   "url": "https://dl.airtable.com/.attachments/719fa6eb92780979dbcf0a7a0c5c04a5/a2cee7a2/input.txt",
+  //   "filename": "input.txt",
+  //   "size": 9311,
+  //   "type": "text/plain"
+  // }
+
+  const inputs = day.fields.inputs.map(({ filename, url }) => ({
+    filename,
+    url,
+    isOgInput: filename === 'input.txt',
+  }))
+
+  const defaultInputData = inputs.find((input) => input.isOgInput)
+
+  // No default input found
+  if (!defaultInputData) {
+    throw new Error(`No default input found for Day ${day.fields.name}. 🤷`)
   }
-  fields: DayFields
+
+  // Load the default input text file
+  // return await got(defaultInputData.url).text()
+  return await got('defaultInputData.url').text()
 }
 
 async function getDay({ yearName, name }: Record<string, any>): Promise<Day | void> {

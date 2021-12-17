@@ -107,8 +107,7 @@ async function getInput(day: Day): Promise<string> {
   }
 
   // Load the default input text file
-  // return await got(defaultInputData.url).text()
-  return await got('defaultInputData.url').text()
+  return await got(defaultInputData.url).text()
 }
 
 async function getDay({ yearName, name }: Record<string, any>): Promise<Day | void> {

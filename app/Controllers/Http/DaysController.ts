@@ -59,11 +59,6 @@ export default class DaysController {
       return response.safeStatus(404).send(`Sorry, no data found for ${name}/${yearName}. 😔`)
     }
 
-    // If there is no input data, throw an Error
-    if (!day.fields.inputs && !Array.isArray(day.fields.inputs)) {
-      throw new Error(`No inputs found for Day ${day.fields.name}. 🤷`)
-    }
-
     // Get input from Airtable
     const input = await getInput(day)
 
@@ -85,6 +80,23 @@ export default class DaysController {
 }
 
 async function getInput(day: Day): Promise<string> {
+  // INFO: Test object
+  // day = {
+  //   _table: '',
+  //   _rawJson: {
+  //     id: '',
+  //     createdTime: '',
+  //     fields: { name: '', inputs: [], parts: [], year: [''], yearName: [''] },
+  //   },
+  //   id: '',
+  //   fields: { name: '7', inputs: [], parts: [], year: [''], yearName: [''] },
+  // }
+
+  // If there is no input data, throw an Error
+  if (!day.fields.inputs || !Array.isArray(day.fields.inputs) || day.fields.inputs.length === 0) {
+    throw new Error(`No inputs found for Day ${day.fields.name}. 🤷`)
+  }
+
   // inputExample = {
   //   "id": "attTgDPOonsptzEYC",
   //   "url": "https://dl.airtable.com/.attachments/719fa6eb92780979dbcf0a7a0c5c04a5/a2cee7a2/input.txt",

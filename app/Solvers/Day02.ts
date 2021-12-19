@@ -90,7 +90,4 @@ export const solvePart2 = async (input: string) => {
   return positionDepthAndAim.horizontalPosition * positionDepthAndAim.depth
 }
 
-export default {
-  solvePart1,
-  solvePart2,
-}
+export default [solvePart1, solvePart2]

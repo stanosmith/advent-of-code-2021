@@ -50,7 +50,4 @@ function parseInput(input) {
     .map((value) => parseInt(value))
 }
 
-export default {
-  solvePart1,
-  solvePart2,
-}
+export default [solvePart1, solvePart2]

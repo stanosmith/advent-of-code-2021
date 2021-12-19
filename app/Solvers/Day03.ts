@@ -95,7 +95,4 @@ export const solvePart2 = async (input: string) => {
   return input.split('\n')
 }
 
-export default {
-  solvePart1,
-  solvePart2,
-}
+export default [solvePart1, solvePart2]

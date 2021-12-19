@@ -29,20 +29,6 @@ interface AirtableRecord {
   id: string
   fields: Object
 }
-interface DayFields {
-  name: string
-  parts: string[]
-  inputs: Attachment[]
-  year: string[]
-  yearName: string[]
-}
-interface DayJson extends RawJson {
-  fields: DayFields
-}
-interface Day extends AirtableRecord {
-  _rawJson: DayJson
-  fields: DayFields
-}
 interface PartFields {
   name: string
   description: string
@@ -57,6 +43,20 @@ interface PartJson extends RawJson {
 interface Part extends AirtableRecord {
   _rawJson: PartJson
   fields: PartFields
+}
+interface DayFields {
+  name: string
+  parts: Part[]
+  inputs: Attachment[]
+  year: string[]
+  yearName: string[]
+}
+interface DayJson extends RawJson {
+  fields: DayFields
+}
+interface Day extends AirtableRecord {
+  _rawJson: DayJson
+  fields: DayFields
 }
 
 export default class DaysController {
@@ -79,38 +79,33 @@ export default class DaysController {
 
     // Send 404 if day is not found
     if (!day || !day.fields) {
-      return response.safeStatus(404).send(`Sorry, no data found for ${name}/${yearName}. 😔`)
+      return response
+        .safeStatus(404)
+        .send(`Sorry, no data found for year ${yearName} day ${name}. 😔`)
     }
 
     // Get input from Airtable
     const input = await getInput(day)
 
-    // TODO: Loop through the parts, load their data and only solve if there is no answer
-    // Solve each part
+    // Get solvers for the day
     const daySolvers = solvers[`day${day.fields.name.padStart(2, '0')}`]
 
-    // const parts = await Promise.all(
-    //   day.fields.parts.map((part, index) => {
-    //     if (part.answer) {
-    //     }
-    //     return daySolvers[index](input)
-    //   })
-    // )
-    //
-    // return parts.map((part, index) => ({
-    //   [`part${index + 1}`]: { answer: part },
-    // }))
+    // Return, or solve and return, the answers for each part
+    let answers = [] as Array<any>
 
-    let part1 = {}
-    let part2 = {}
-
-    // If we have solvers, solve each part
     if (typeof daySolvers !== 'undefined') {
-      part1 = { answer: await daySolvers.solvePart1(input) }
-      part2 = { answer: await daySolvers.solvePart2(input) }
+      answers = await Promise.all(
+        day.fields.parts.map((part, index) => {
+          return part.fields.answer || daySolvers[index](input)
+        })
+      )
+      answers = answers.map((answer, index) => ({
+        name: `Part ${index + 1}`,
+        answer,
+      }))
     }
 
-    return response.send({ part1, part2, ...day })
+    return response.send({ answers, ...day })
   }
 }
 

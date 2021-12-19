@@ -18,7 +18,5 @@ function parseInput(input: string): Array<number> {
     .map((value) => parseInt(value))
 }
 
-export default {
-  solvePart1,
-  solvePart2,
-}
+// export default [solvePart1, solvePart2]
+export default { solvePart1, solvePart2 }

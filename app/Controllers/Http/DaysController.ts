@@ -18,6 +18,17 @@ interface Attachment {
   size: number
   type: string
 }
+interface RawJson {
+  id: string
+  fields: Object
+  createdTime: string
+}
+interface AirtableRecord {
+  _table: Object
+  _rawJson: RawJson
+  id: string
+  fields: Object
+}
 interface DayFields {
   name: string
   parts: string[]
@@ -25,15 +36,27 @@ interface DayFields {
   year: string[]
   yearName: string[]
 }
-interface Day {
-  _table: Object
-  id: string
-  _rawJson: {
-    id: string
-    fields: DayFields
-    createdTime: string
-  }
+interface DayJson extends RawJson {
   fields: DayFields
+}
+interface Day extends AirtableRecord {
+  _rawJson: DayJson
+  fields: DayFields
+}
+interface PartFields {
+  name: string
+  description: string
+  answer: string
+  day: string[]
+  year: string[]
+  processedData: Attachment[]
+}
+interface PartJson extends RawJson {
+  fields: PartFields
+}
+interface Part extends AirtableRecord {
+  _rawJson: PartJson
+  fields: PartFields
 }
 
 export default class DaysController {
@@ -65,6 +88,18 @@ export default class DaysController {
     // TODO: Loop through the parts, load their data and only solve if there is no answer
     // Solve each part
     const daySolvers = solvers[`day${day.fields.name.padStart(2, '0')}`]
+
+    // const parts = await Promise.all(
+    //   day.fields.parts.map((part, index) => {
+    //     if (part.answer) {
+    //     }
+    //     return daySolvers[index](input)
+    //   })
+    // )
+    //
+    // return parts.map((part, index) => ({
+    //   [`part${index + 1}`]: { answer: part },
+    // }))
 
     let part1 = {}
     let part2 = {}
@@ -147,6 +182,13 @@ async function getDay({ yearName, name }: Record<string, any>): Promise<Day | vo
 
       // There should only be one item in the array
       day = page[0]
+
+      // Get full data for each part
+      day.fields.parts = await Promise.all(
+        day.fields.parts.map((id) => {
+          return base('Parts').find(id)
+        })
+      )
     } catch (e) {
       console.error(e)
     }

@@ -12,7 +12,7 @@ export const solvePart1 = async (input: string) => {
 
   const crabPositions = parseInput(input)
 
-  const highestPosition = [...crabPositions].sort((a, b) => a - b).pop() || 0
+  const highestPosition = getHighestPosition(crabPositions)
 
   let calculations = [] as Array<Object>
   for (let i = 0; i < highestPosition + 1; i++) {
@@ -30,8 +30,35 @@ export const solvePart1 = async (input: string) => {
 }
 
 export const solvePart2 = async (input: string) => {
-  // input =
-  return input
+  // input = '16,1,2,0,4,2,7,1,2,14\n'
+  const crabPositions = parseInput(input)
+
+  const highestPosition = getHighestPosition(crabPositions)
+
+  let calculations = [] as Array<Object>
+  for (let i = 0; i < highestPosition + 1; i++) {
+    calculations.push({
+      position: i,
+      fuel: crabPositions.reduce((sum, value) => {
+        const positionDiff = Math.abs(i - value)
+        const ogFuel = sum + positionDiff
+        // TODO: Add the variable fuel rate to the originally calculated value
+        const variableFuel = Array(positionDiff).fill(undefined).reduce(calculateVariableFuel, 0)
+        return ogFuel + variableFuel
+      }, 0),
+    })
+  }
+
+  return sortBy(calculations, 'fuel')[0].fuel
+  // return sortBy(calculations, 'fuel')
+}
+
+function calculateVariableFuel(sum, _value, index, _allValues) {
+  return sum + index
+}
+
+function getHighestPosition(positions) {
+  return [...positions].sort((a, b) => a - b).pop() || 0
 }
 
 function parseInput(input: string): Array<number> {

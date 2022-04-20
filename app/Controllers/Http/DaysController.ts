@@ -8,7 +8,7 @@ import solvers from 'App/Solvers'
 
 const base = new Airtable({ apiKey: Env.get('AIRTABLE_KEY') }).base(Env.get('AIRTABLE_BASE'))
 const tableName = 'Days'
-const useCache = false
+const useCache = true
 
 // Custom interfaces
 interface Attachment {
